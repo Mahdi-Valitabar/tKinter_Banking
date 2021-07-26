@@ -13,11 +13,15 @@ label1.grid(row = 0, column = 0)
 
 Text_box1 = Entry(root, width = 30, borderwidth = 5)
 Text_box1.grid(row = 1, column = 0)
-Text_box1.insert(0,"Enter your name")
+Text_box1.insert(0,"Enter your name here")
 
 Text_box2 = Entry(root, width = 30, borderwidth = 5)
 Text_box2.grid(row = 2, column = 0)
-Text_box2.insert(0,"Enter your family")
+Text_box2.insert(0,"Enter your family here")
+
+Text_box3 = Entry(root, width = 30, borderwidth = 5)
+Text_box3.grid(row = 3, column = 0)
+Text_box3.insert(0,"Enter your ID number here")
 
 def Submit():
     global name 
@@ -26,11 +30,13 @@ def Submit():
     family = Text_box2.get()
     global user 
     user = name.title() + "_" +family.title()
+    global ID
+    ID = Text_box3.get()
     ### close the first window
     root.destroy()
         
 Button_submit = Button(root, text = "Submit",padx = 20, pady = 10, command = Submit)
-Button_submit.grid(row = 3, column = 0)
+Button_submit.grid(row = 4, column = 0)
 
 ###### Close the first window
 root.mainloop()
@@ -42,7 +48,7 @@ root = Tk()
 root.title("Kiwi Bank")
 
 Text_box = Entry(root, width = 50, borderwidth = 5)
-Text_box.grid(row = 0, column = 0, columnspan = 50 )
+Text_box.grid(row = 6, column = 0, columnspan = 50 )
 
 initial_message = ("""
 Please select your required service.
@@ -56,37 +62,62 @@ and then push
 
 ### Create the middle text box
 Text_box3 = Text(height = 10, width = 40)
-Text_box3.grid(row = 6, column = 0, columnspan = 50)
+Text_box3.grid(row = 5, column = 0, columnspan = 50)
 Text_box3.insert('end',initial_message)
+
 
 ### define Clear button 
 def button_cel():
     Text_box.delete(0,END)
-   
+
+    
 ### Make a new account
 def Make_newAccount():
-    with open (user,"w") as file_object:
-        file_object.write("Client: " + user)
-        file_object.write("\n")
-        file_object.write("Deposit:\n" + str(100))
-        file_object.write("\n")
+    try:
+        with open("Accounts_list") as file_object:
+            lines = file_object.readlines()
+            for line in lines:
+                line = line.strip()
+                Accounts.append(line)
+    except:
+        pass
+                
+    if user_id in Accounts:
+        pass
+    else:
+        with open (user,"w") as file_object:
+            file_object.write("Client: " + user)
+            file_object.write("\n")
+            file_object.write("ID number:\n" + ID)
+            file_object.write("\n")
+            file_object.write("Deposit:\n" + str(100))
+            file_object.write("\n")
 
-    with open ("Accounts_list","a") as file_object:
-        file_object.write(user)
-        file_object.write("\n")      
+        with open ("Accounts_list","a") as file_object:
+            file_object.write(user + " (" + ID + ")")
+            file_object.write("\n")
 
-    message1 = "Dear " + name.title() + """
+        message1 = "Dear " + name.title() + """
 you now have an account in:\n<<<Kiwi Bank>>>\n"""
     
-    Text_box3.delete(1.0, 'end')
-    Text_box3.insert('end',message1)
-   
+        Text_box3.delete(1.0, 'end')
+        Text_box3.insert('end',message1)
+
+  
 ### Print account info
 def print_info():
-    with open(user) as file_object:
-        lines = file_object.readlines()
+    if user_id in Accounts:
+        with open(user) as file_object:
+            lines = file_object.readlines()
+            client = lines[0]
+            deposit = lines[len(lines)-1]
+            message = client + "\n" + "You have " + deposit + " dollors in your Bank account.\n" + "\nID number:\n" + ID
+            Text_box3.delete(1.0, 'end')
+            Text_box3.insert('end',message)
+    else:
+        message = "Dear "+ user+ " you do not have an account\nin this bank.\n"
         Text_box3.delete(1.0, 'end')
-        Text_box3.insert('end',lines)      
+        Text_box3.insert('end',message)
 
 ### Close an existing account
 def Close_Account():
@@ -96,6 +127,17 @@ def Close_Account():
         close_message = "The following account was terminated:\n",user,"\nWe hope to see you again!"
         Text_box3.delete(1.0, 'end')
         Text_box3.insert('end',close_message)
+
+        New_Accounts = []
+        for client in Accounts:
+            if client == user_id:
+                continue
+            else:
+                New_Accounts.append(client)
+        with open ("Accounts_list","w") as file_object:
+            for client in New_Accounts:
+                file_object.write(client)
+                file_object.write("\n")
     except:
         close_message = "Dear "+ user+ " you do not have an account\nin this bank.\n"
         Text_box3.delete(1.0, 'end')
@@ -103,43 +145,57 @@ def Close_Account():
 
 ### Define a function to increase deposit 
 def Increase():
-    global order
-    order = "inc"
-    with open(user) as file_object:
-        lines = file_object.readlines()
-        last_line = lines[len(lines)-1]
-        Last_transaction = last_line.split(" ")
-        global current_deposit
-        current_deposit = Last_transaction[len(Last_transaction)-1]
-        current_deposit = int(current_deposit)
+    if user_id in Accounts:
+        global order
+        order = "inc"
+        with open(user) as file_object:
+            lines = file_object.readlines()
+            last_line = lines[len(lines)-1]
+            Last_transaction = last_line.split(" ")
+            global current_deposit
+            current_deposit = Last_transaction[len(Last_transaction)-1]
+            current_deposit = int(current_deposit)
 
-    increase_message = """
+        increase_message = """
 How much do you want to increase?
 
 Enter a valid digit number and then push
 ***submit button.***"""
-    Text_box3.delete(1.0, 'end')
-    Text_box3.insert('end',increase_message)
+        Text_box3.delete(1.0, 'end')
+        Text_box3.insert('end',increase_message)
 
+    else:
+        message = "Dear "+ user+ " you do not have an account\nin this bank.\n"
+        Text_box3.delete(1.0, 'end')
+        Text_box3.insert('end',message)
+
+        
 ### Define a function to decrease deposit 
 def Decrease():
-    global order
-    order = "dec"
-    with open(user) as file_object:
-        lines = file_object.readlines()
-        last_line = lines[len(lines)-1]
-        Last_transaction = last_line.split(" ")
-        global current_deposit
-        current_deposit = Last_transaction[len(Last_transaction)-1]
-        current_deposit = int(current_deposit)
-    decrease_message = """
+    if user_id in Accounts:
+        global order
+        order = "dec"
+        with open(user) as file_object:
+            lines = file_object.readlines()
+            last_line = lines[len(lines)-1]
+            Last_transaction = last_line.split(" ")
+            global current_deposit
+            current_deposit = Last_transaction[len(Last_transaction)-1]
+            current_deposit = int(current_deposit)
+        decrease_message = """
 How much money do you want?
 
 Enter a valid digit number and then push
 
 *** Submit Button ***"""
-    Text_box3.delete(1.0, 'end')
-    Text_box3.insert('end',decrease_message)
+        Text_box3.delete(1.0, 'end')
+        Text_box3.insert('end',decrease_message)
+
+    else:
+        message = "Dear "+ user+ " you do not have an account\nin this bank.\n"
+        Text_box3.delete(1.0, 'end')
+        Text_box3.insert('end',message)
+
 
 ### Define submit button to get user value to either increase or decrease deposit
 def Submit():
@@ -166,18 +222,25 @@ def Submit():
 
 ### Make a list of Bank clients 
 Accounts = []
-with open("Accounts_list") as file_object:
-    lines = file_object.readlines()
-    for line in lines:
-        line = line.strip()
-        Accounts.append(line)
-print (Accounts)
-if user in Accounts:
+try:
+    with open("Accounts_list") as file_object:
+        lines = file_object.readlines()
+        for line in lines:
+            line = line.strip()
+            Accounts.append(line)
+except:
+    pass
+
+
+### Define a variable to check whether client has an account here or not...    
+user_id = user + " (" + ID + ")"
+    
+if user_id in Accounts:
     Button_open = Button(root, text = " ",padx = 120, pady = 10)
-    Button_open.grid(row = 1, column = 0, columnspan = 50)
+    Button_open.grid(row = 0, column = 0, columnspan = 50)
 else:
     Button_open = Button(root, text = "New account",padx = 120, pady = 10, command = Make_newAccount)
-    Button_open.grid(row = 1, column = 0, columnspan = 50)
+    Button_open.grid(row = 0, column = 0, columnspan = 50)
 
 ### Create Buttons 
 Button_close = Button(root, text = "Close account",padx = 120, pady = 10, command = Close_Account)
@@ -186,10 +249,10 @@ Button_add = Button(root, text = "Increase",padx = 135, pady = 10, command = Inc
 Button_dec = Button(root, text = "Decrease",padx = 130, pady = 10, command = Decrease)
 Button_submit = Button(root, text = "Submit",padx = 140, pady = 30, command = Submit)
 
-Button_close.grid(row = 2, column = 0, columnspan = 50)
-Button_info.grid(row = 3, column = 0, columnspan = 50)
-Button_add.grid(row = 4, column = 0, columnspan = 50)
-Button_dec.grid(row = 5, column = 0, columnspan = 50)
+Button_close.grid(row = 1, column = 0, columnspan = 50)
+Button_info.grid(row = 2, column = 0, columnspan = 50)
+Button_add.grid(row = 3, column = 0, columnspan = 50)
+Button_dec.grid(row = 4, column = 0, columnspan = 50)
 Button_submit.grid(row = 7, column = 0, columnspan = 50)
 
 root.mainloop()
