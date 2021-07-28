@@ -242,17 +242,23 @@ else:
     Button_open = Button(root, text = "New account",padx = 120, pady = 10, command = Make_newAccount)
     Button_open.grid(row = 0, column = 0, columnspan = 50)
 
+def Exit():
+    root.destroy()
+ 
+ 
 ### Create Buttons 
 Button_close = Button(root, text = "Close account",padx = 120, pady = 10, command = Close_Account)
 Button_info = Button(root, text = "Account information",padx = 100, pady = 10, command = print_info)
 Button_add = Button(root, text = "Increase",padx = 135, pady = 10, command = Increase)
 Button_dec = Button(root, text = "Decrease",padx = 130, pady = 10, command = Decrease)
 Button_submit = Button(root, text = "Submit",padx = 140, pady = 30, command = Submit)
+Button_Exit = Button(root, text = "Exit",padx = 150, pady = 10, command = Exit)
 
 Button_close.grid(row = 1, column = 0, columnspan = 50)
 Button_info.grid(row = 2, column = 0, columnspan = 50)
 Button_add.grid(row = 3, column = 0, columnspan = 50)
 Button_dec.grid(row = 4, column = 0, columnspan = 50)
 Button_submit.grid(row = 7, column = 0, columnspan = 50)
+Button_Exit.grid(row = 8, column = 0, columnspan = 50)
 
 root.mainloop()
