@@ -236,7 +236,7 @@ except:
 user_id = user + " (" + ID + ")"
     
 if user_id in Accounts:
-    Button_open = Button(root, text = " ",padx = 120, pady = 10)
+    Button_open = Button(root, text = "New account", state = DISABLED, padx = 120, pady = 10)
     Button_open.grid(row = 0, column = 0, columnspan = 50)
 else:
     Button_open = Button(root, text = "New account",padx = 120, pady = 10, command = Make_newAccount)
